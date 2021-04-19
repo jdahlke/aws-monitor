@@ -1,0 +1,58 @@
+service: monitor
+frameworkVersion: '2'
+configValidationMode: error
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'staging'}
+  region: eu-central-1
+  memorySize: 128
+  timeout: 5
+  lambdaHashingVersion: '20201221'
+  logRetentionInDays: 7
+  deploymentBucket:
+    name: ${env:DEPLOYMENT_BUCKET}
+    serverSideEncryption: AES256
+  iam:
+    role: ${env:IAM_ROLE}
+  environment:
+    STAGE: ${self:provider.stage}
+    SLACK_URL: ${env:SLACK_URL}
+    SLACK_CHANNEL_ALERT: ${env:SLACK_CHANNEL_ALERT}
+    SLACK_CHANNEL_INFO: ${env:SLACK_CHANNEL_INFO}
+  eventBridge:
+    useCloudFormation: true
+
+functions:
+  alert:
+    handler: src/handler.alert
+    description: 'Post CloudWatch alarms to Slack'
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - aws.cloudwatch
+            detail-type:
+              - CloudWatch Alarm State Change
+  info:
+    handler: src/handler.info
+    description: 'Post AWS events to Slack'
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - aws.codepipeline
+            detail-type:
+              - CodePipeline Action Execution State Change
+            detail:
+              type:
+                category:
+                  - Build
+                  - Deploy
+
+
+package:
+  exclude:
+    - 'test/**'
