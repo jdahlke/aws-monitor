@@ -1,0 +1,17 @@
+.DS_Store
+.node-version
+.ruby-version
+
+# Serverless directories
+**/.serverless
+
+.env
+.env.*
+!.env.example
+
+# package directories
+**/node_modules
+**/jspm_packages
+
+package-lock.json
+

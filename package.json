@@ -1,0 +1,26 @@
+{
+  "name": "aws-monitor",
+  "description": "A Lambda function to report AWS events to Slack.",
+  "version": "1.0.0",
+  "main": "handler.js",
+  "scripts": {
+    "lint": "standard",
+    "test": "mocha 'test/**/*-test.js' --reporter spec --timeout 500"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/infopark-customers/bima-infrastructure"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "is-empty": "^1.2.0",
+    "node-fetch": "^2.3.0"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.282.1",
+    "lambda-tester": "^4.0.1",
+    "mocha": "^6.0.2",
+    "nock": "^13.0.11"
+  }
+}
