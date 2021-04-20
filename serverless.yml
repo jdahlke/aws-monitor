@@ -54,5 +54,5 @@ functions:
 
 
 package:
-  exclude:
-    - 'test/**'
+  patterns:
+    - '!test/**'
