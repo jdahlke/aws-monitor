@@ -84,6 +84,17 @@ class AlarmEvent {
 
     return 'good'
   }
+
+  autoScaling () {
+    const { detail } = this.event
+    const description = detail.configuration.description
+
+    if (description.includes('TargetTrackingScaling policy')) {
+      return true
+    }
+
+    return false
+  }
 }
 
 module.exports = AlarmEvent
