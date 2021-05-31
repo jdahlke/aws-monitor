@@ -53,7 +53,7 @@ class PipelineEvent {
     const execution = detail['execution-id']
     const state = detail.state.toLowerCase()
 
-    const title = `*Pipeline ${pipeline} ${action} ${state}*`
+    const title = `*Code Pipeline ${pipeline}: ${action} ${state}*`
     const link = `<https://${region}.console.aws.amazon.com/codesuite/codepipeline/pipelines/${pipeline}/executions/${execution}/timeline|view details>`
 
     return {

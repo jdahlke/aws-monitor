@@ -9,6 +9,11 @@ async function alert (event, context, callback) {
 
   const alarmEvent = new AlarmEvent(event)
 
+  if (alarmEvent.autoScaling()) {
+    callback(null)
+    return
+  }
+
   try {
     await notify({
       event: alarmEvent,

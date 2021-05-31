@@ -21,6 +21,7 @@
     "aws-sdk": "^2.282.1",
     "lambda-tester": "^4.0.1",
     "mocha": "^6.0.2",
-    "nock": "^13.0.11"
+    "nock": "^13.0.11",
+    "serverless-prune-plugin": "^1.5.0"
   }
 }

@@ -16,7 +16,7 @@ mkdir node_modules
 npm install
 ```
 
-2. Create `.env`
+2. Create `.env` from `env.example`
 
 
 ### Deployment

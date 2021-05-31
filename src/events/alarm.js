@@ -67,10 +67,11 @@ class AlarmEvent {
     const { alarmName, state } = detail
 
     const title = `*Alarm ${alarmName} changed to ${state.value}*`
+    const description = detail.configuration.description
     const link = `<https://${region}.console.aws.amazon.com/cloudwatch/home#alarmsV2:alarm/${alarmName}|view details>`
 
     return {
-      [title]: link
+      [title]: `${description} - ${link}`
     }
   }
 
@@ -82,6 +83,17 @@ class AlarmEvent {
     }
 
     return 'good'
+  }
+
+  autoScaling () {
+    const { detail } = this.event
+    const description = detail.configuration.description
+
+    if (description.includes('TargetTrackingScaling policy')) {
+      return true
+    }
+
+    return false
   }
 }
 
