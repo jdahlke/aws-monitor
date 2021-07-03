@@ -72,4 +72,6 @@ class PipelineEvent {
   }
 }
 
+PipelineEvent.detailType = 'CodePipeline Action Execution State Change'
+
 module.exports = PipelineEvent
