@@ -66,34 +66,59 @@ describe('handler', () => {
   })
 
   describe('.info', () => {
-    const event = {
-      'detail-type': 'CodePipeline Action Execution State Change',
-      source: 'aws.codepipeline',
-      account: 123456789012,
-      time: '2020-01-24T22:03:07Z',
-      region: 'us-east-1',
-      resources: [
-        'arn:aws:codepipeline:us-east-1:123456789012:myPipeline'
-      ],
-      detail: {
-        pipeline: 'myPipeline',
-        'execution-id': '12345678-1234-5678-abcd-12345678abcd',
-        stage: 'Prod',
-        action: 'myAction',
-        state: 'STARTED',
-        type: {
-          owner: 'AWS',
-          category: 'Deploy',
-          provider: 'CodeDeploy',
-          version: 1
+    describe('Code Pipeline event', () => {
+      const event = {
+        'detail-type': 'CodePipeline Action Execution State Change',
+        source: 'aws.codepipeline',
+        account: 123456789012,
+        time: '2020-01-24T22:03:07Z',
+        region: 'us-east-1',
+        resources: [
+          'arn:aws:codepipeline:us-east-1:123456789012:myPipeline'
+        ],
+        detail: {
+          pipeline: 'myPipeline',
+          'execution-id': '12345678-1234-5678-abcd-12345678abcd',
+          stage: 'Prod',
+          action: 'myAction',
+          state: 'STARTED',
+          type: {
+            owner: 'AWS',
+            category: 'Deploy',
+            provider: 'CodeDeploy',
+            version: 1
+          }
         }
       }
-    }
 
-    it('returns success', () => {
-      return LambdaTester(handler.info)
-        .event(event)
-        .expectResult()
+      it('returns success', () => {
+        return LambdaTester(handler.info)
+          .event(event)
+          .expectResult()
+      })
+    })
+
+    describe('EC2 Instance state change event', () => {
+      const event = {
+        'detail-type': 'EC2 Instance State-change Notification',
+        source: 'aws.ec2',
+        account: '123456789012',
+        time: '2019-11-11T21: 29: 54Z',
+        region: 'us-east-1',
+        resources: [
+          'arn:aws:ec2:us-east-1:123456789012:instance/i-abcd1111'
+        ],
+        detail: {
+          'instance-id': 'i-abcd1111',
+          state: 'pending'
+        }
+      }
+
+      it('returns success', () => {
+        return LambdaTester(handler.info)
+          .event(event)
+          .expectResult()
+      })
     })
   })
 })
