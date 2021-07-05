@@ -1,15 +1,14 @@
 'use strict'
 
-const AlarmEvent = require('./events/alarm')
-const PipelineEvent = require('./events/pipeline')
+const createEvent = require('./create-event')
 const SlackMessage = require('./slack/message')
 
 async function alert (event, context, callback) {
   console.log('Alarm: ', JSON.stringify(event, null, 2))
 
-  const alarmEvent = new AlarmEvent(event)
+  const alarmEvent = createEvent(event)
 
-  if (alarmEvent.autoScaling()) {
+  if (alarmEvent.autoScaling && alarmEvent.autoScaling()) {
     callback(null)
     return
   }
@@ -31,7 +30,7 @@ async function alert (event, context, callback) {
 async function info (event, context, callback) {
   console.log('Info: ', JSON.stringify(event, null, 2))
 
-  const infoEvent = new PipelineEvent(event)
+  const infoEvent = createEvent(event)
 
   try {
     await notify({

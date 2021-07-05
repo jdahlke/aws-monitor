@@ -97,4 +97,6 @@ class AlarmEvent {
   }
 }
 
+AlarmEvent.detailType = 'CloudWatch Alarm State Change'
+
 module.exports = AlarmEvent
