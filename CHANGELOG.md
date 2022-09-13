@@ -1,5 +1,8 @@
 ## Changelog
 
+#### 1.0.3
+- upgrade to `nodejs16.x`
+
 #### 1.0.2
 - upgrade to `nodejs14.x`
 
