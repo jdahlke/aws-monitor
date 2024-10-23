@@ -1,0 +1,184 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: The AWS CloudFormation template for AWS Event Monitoring
+
+Parameters:
+
+  Environment:
+    Type: String
+    AllowedValues:
+      - staging
+      - production
+  LambdaRole:
+    Type: String
+  S3Bucket:
+    Type: String
+  S3Key:
+    Type: String
+  SlackUrl:
+    Type: String
+  SlackChannelAlert:
+    Type: String
+  SlackChannelInfo:
+    Type: String
+
+Resources:
+
+  AlertLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/monitor-alert-${Environment}"
+      RetentionInDays: 14
+
+  AlertLambdaFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+    - AlertLogGroup
+    Properties:
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: !Ref S3Key
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Description: Post Alert Events to Slack
+      FunctionName: !Sub monitor-alert-${Environment}
+      MemorySize: 128
+      Timeout: 5
+      Environment:
+        Variables:
+          SLACK_URL: !Ref SlackUrl
+          SLACK_CHANNEL: !Ref SlackChannelAlert
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${LambdaRole}
+
+  AlertEventBridgeRule1:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+        - aws.cloudwatch
+        detail-type:
+        - CloudWatch Alarm State Change
+      Name: monitor-alert-rule-1
+      State: ENABLED
+      Targets:
+      - Arn:
+          Fn::GetAtt:
+          - AlertLambdaFunction
+          - Arn
+        Id: monitor-alert-rule-1-target
+  AlertEventBridgeLambdaPermission1:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: AlertLambdaFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::Join:
+        - ":"
+        - - arn
+          - Ref: AWS::Partition
+          - events
+          - Ref: AWS::Region
+          - Ref: AWS::AccountId
+          - Fn::Join:
+            - "/"
+            - - rule
+              - monitor-alert-rule-1
+
+  InfoLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/monitor-info-${Environment}"
+      RetentionInDays: 14
+
+  InfoLambdaFunction:
+    Type: AWS::Lambda::Function
+    DependsOn:
+    - InfoLogGroup
+    Properties:
+      Code:
+        S3Bucket: !Ref S3Bucket
+        S3Key: !Ref S3Key
+      Handler: bootstrap
+      Runtime: provided.al2023
+      Description: Post Info Events to Slack
+      FunctionName: !Sub monitor-info-${Environment}
+      MemorySize: 128
+      Timeout: 5
+      Environment:
+        Variables:
+          SLACK_URL: !Ref SlackUrl
+          SLACK_CHANNEL: !Ref SlackChannelInfo
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/${LambdaRole}
+
+  InfoEventBridgeRule1:
+    Type: AWS::Events::Rule
+    Properties:
+      EventPattern:
+        source:
+        - aws.codepipeline
+        detail-type:
+        - CodePipeline Action Execution State Change
+      Name: monitor-info-rule-1
+      State: ENABLED
+      Targets:
+      - Arn:
+          Fn::GetAtt:
+          - InfoLambdaFunction
+          - Arn
+        Id: monitor-info-rule-1-target
+  InfoEventBridgeLambdaPermission1:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Ref: InfoLambdaFunction
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::Join:
+        - ":"
+        - - arn
+          - Ref: AWS::Partition
+          - events
+          - Ref: AWS::Region
+          - Ref: AWS::AccountId
+          - Fn::Join:
+            - "/"
+            - - rule
+              - monitor-info-rule-1
+
+#  InfoEventBridgeRule2:
+#    Type: AWS::Events::Rule
+#    Properties:
+#      EventPattern:
+#        source:
+#        - aws.ec2
+#        detail-type:
+#        - EC2 Instance State-change Notification
+#      Name: monitor-info-rule-2
+#      State: ENABLED
+#      Targets:
+#      - Arn:
+#          Fn::GetAtt:
+#          - InfoLambdaFunction
+#          - Arn
+#        Id: monitor-alert-rule-2-target
+#  InfoEventBridgeLambdaPermission2:
+#    Type: AWS::Lambda::Permission
+#    Properties:
+#      Action: lambda:InvokeFunction
+#      FunctionName:
+#        Ref: InfoLambdaFunction
+#      Principal: events.amazonaws.com
+#      SourceArn:
+#        Fn::Join:
+#        - ":"
+#        - - arn
+#          - Ref: AWS::Partition
+#          - events
+#          - Ref: AWS::Region
+#          - Ref: AWS::AccountId
+#          - Fn::Join:
+#            - "/"
+#            - - rule
+#              - monitor-info-rule-2
