@@ -18,5 +18,11 @@ go test ./...
 Deploy new application code
 
 ```
-AWS_PROFILE=placeholder bin/deploy
+AWS_PROFILE=placeholder bin/deploy staging|production
 ```
+
+#### Setup
+
+Use the CloudFormation template in `aws/template.yml` to create a new Stack
+`aws-monitor`.
+The Lambda function only needs basic permissions.

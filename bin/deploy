@@ -1,0 +1,12 @@
+#!/bin/sh
+
+STAGE=${1:-staging}
+
+GOARCH=amd64 GOOS=linux go build -ldflags="-s -w" -tags lambda.norpc -o .build/bootstrap ./cmd/aws-monitor
+
+cd .build
+zip monitor.zip bootstrap
+cd ..
+
+aws lambda update-function-code --function-name monitor-alert-$STAGE --region eu-central-1 --zip-file fileb://.build/monitor.zip
+aws lambda update-function-code --function-name monitor-info-$STAGE --region eu-central-1 --zip-file fileb://.build/monitor.zip
