@@ -64,7 +64,7 @@ func (e codePipelineEvent) ReportEvent(ctx context.Context) bool {
 	case "FAILED":
 		return true
 	case "SUCCEEDED":
-		return true
+		return false
 	default:
 		return false
 	}
